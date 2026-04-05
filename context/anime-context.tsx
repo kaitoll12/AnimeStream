@@ -53,8 +53,8 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
       try {
         const response = await fetch('/api/anime')
         if (response.ok) {
-          const data = await response.ok ? await response.json() : []
-          setAnimes(data)
+          const data = await response.json()
+          setAnimes(data || [])
         }
       } catch (error) {
         console.error('Error fetching animes:', error)
