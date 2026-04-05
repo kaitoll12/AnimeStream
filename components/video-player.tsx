@@ -228,15 +228,17 @@ export function VideoPlayer({ src, title, poster, onEnded }: VideoPlayerProps) {
       embedSrc = `https://voe.sx/e/${id}`
     }
 
+    const isStreamtape = src.includes("streamtape.com") || src.includes("voe.sx")
+
     return (
       <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-border">
-        {/* Adjusted sandbox for Streamtape compatibility while still blocking popups */}
+        {/* We remove sandbox for Streamtape/Voe as they aggressively block it */}
         <iframe
           src={embedSrc}
           className="absolute inset-0 w-full h-full"
           allowFullScreen
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          sandbox="allow-forms allow-scripts allow-same-origin allow-presentation allow-pointer-lock allow-popups-to-escape-sandbox"
+          sandbox={isStreamtape ? undefined : "allow-forms allow-scripts allow-same-origin allow-presentation allow-pointer-lock allow-popups-to-escape-sandbox"}
         />
       </div>
     )
