@@ -687,6 +687,9 @@ export default function AdminPage() {
   const [episodeTitle, setEpisodeTitle] = useState("")
   const [episodeVideoFile, setEpisodeVideoFile] = useState<File | null>(null)
   const [episodeVideoUrl, setEpisodeVideoUrl] = useState("")
+  const [episodeServer1, setEpisodeServer1] = useState("")
+  const [episodeServer2, setEpisodeServer2] = useState("")
+  const [episodeServer3, setEpisodeServer3] = useState("")
   const [uploadType, setUploadType] = useState<"file" | "url">("file")
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState("")
@@ -766,17 +769,27 @@ export default function AdminPage() {
 
       setUploadProgress("Guardando episodio...")
 
-      // Add episode with the video URL
+      // Build servers array if extra links are provided
+      const servers: Server[] = []
+      if (episodeServer1) servers.push({ id: "s1", name: "Servidor 1", url: episodeServer1 })
+      if (episodeServer2) servers.push({ id: "s2", name: "Servidor 2", url: episodeServer2 })
+      if (episodeServer3) servers.push({ id: "s3", name: "Servidor 3", url: episodeServer3 })
+
+      // Add episode with the video URL and extra servers
       addEpisode(selectedAnimeId, {
         number: parseInt(episodeNumber),
         title: episodeTitle,
         videoUrl: url,
+        servers: servers.length > 0 ? servers : undefined
       })
 
       setEpisodeNumber("")
       setEpisodeTitle("")
       setEpisodeVideoFile(null)
       setEpisodeVideoUrl("")
+      setEpisodeServer1("")
+      setEpisodeServer2("")
+      setEpisodeServer3("")
       setIsEpisodeSubmitting(false)
       setIsUploading(false)
       setUploadProgress("")
@@ -1205,11 +1218,40 @@ export default function AdminPage() {
                         <Input
                           value={episodeVideoUrl}
                           onChange={(e) => setEpisodeVideoUrl(e.target.value)}
-                          placeholder="https://ejemplo.com/video.mp4 o link de Drive"
+                          placeholder="Link Principal (Drive, YouTube, etc.)"
                           required
                         />
                       )}
                     </div>
+
+                    {uploadType === "url" && (
+                      <div className="space-y-4 pt-4 border-t border-border">
+                        <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
+                          <ServerIcon className="w-4 h-4 text-primary" />
+                          Servidores Opcionales
+                        </h3>
+                        <div className="grid gap-3">
+                          <Input
+                            value={episodeServer1}
+                            onChange={(e) => setEpisodeServer1(e.target.value)}
+                            placeholder="Servidor 2 (Opcional)"
+                          />
+                          <Input
+                            value={episodeServer2}
+                            onChange={(e) => setEpisodeServer2(e.target.value)}
+                            placeholder="Servidor 3 (Opcional)"
+                          />
+                          <Input
+                            value={episodeServer3}
+                            onChange={(e) => setEpisodeServer3(e.target.value)}
+                            placeholder="Servidor 4 (Opcional)"
+                          />
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">
+                          * Los servidores vacíos no se mostrarán en la página de reproducción.
+                        </p>
+                      </div>
+                    )}
 
                     {isUploading && (
                       <div className="flex items-center gap-2 p-4 bg-primary/10 border border-primary/30 rounded-lg text-primary">
