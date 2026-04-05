@@ -320,8 +320,11 @@ function EditEpisodeModal({
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [videoUrl, setVideoUrl] = useState(episode.videoUrl)
   const [server1, setServer1] = useState(episode.servers?.[0]?.url || "")
+  const [server1Name, setServer1Name] = useState(episode.servers?.[0]?.name || "")
   const [server2, setServer2] = useState(episode.servers?.[1]?.url || "")
+  const [server2Name, setServer2Name] = useState(episode.servers?.[1]?.name || "")
   const [server3, setServer3] = useState(episode.servers?.[2]?.url || "")
+  const [server3Name, setServer3Name] = useState(episode.servers?.[2]?.name || "")
   const [uploadType, setUploadType] = useState<"file" | "url">(
     episode.videoUrl.startsWith("http") && !episode.videoUrl.includes("vercel-storage.com") ? "url" : "file"
   )
@@ -356,9 +359,18 @@ function EditEpisodeModal({
 
     // Build servers array
     const servers: Server[] = []
-    if (server1) servers.push({ id: "s1", name: "Servidor 1", url: server1 })
-    if (server2) servers.push({ id: "s2", name: "Servidor 2", url: server2 })
-    if (server3) servers.push({ id: "s3", name: "Servidor 3", url: server3 })
+    const detectName = (url: string, providedName: string, fallback: string) => {
+      if (providedName) return providedName
+      if (url.includes("drive.google.com")) return "Google Drive"
+      if (url.includes("streamtape.com")) return "Streamtape"
+      if (url.includes("youtube.com") || url.includes("youtu.be")) return "YouTube"
+      if (url.includes("voe.sx")) return "Voe.sx"
+      return fallback
+    }
+
+    if (server1) servers.push({ id: "s1", name: detectName(server1, server1Name, "Servidor 2"), url: server1 })
+    if (server2) servers.push({ id: "s2", name: detectName(server2, server2Name, "Servidor 3"), url: server2 })
+    if (server3) servers.push({ id: "s3", name: detectName(server3, server3Name, "Servidor 4"), url: server3 })
 
     onSave({
       number: parseInt(number),
@@ -495,26 +507,56 @@ function EditEpisodeModal({
 
           {uploadType === "url" && (
             <div className="space-y-4 pt-4 border-t border-border">
-              <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
-                <ServerIcon className="w-4 h-4 text-primary" />
-                Servidores Opcionales
+              <h3 className="text-sm font-medium text-foreground flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <ServerIcon className="w-4 h-4 text-primary" />
+                  Servidores Opcionales
+                </div>
+                <span className="text-[10px] font-normal text-muted-foreground bg-muted px-2 py-0.5 rounded">Auto-detección activa</span>
               </h3>
-              <div className="grid gap-3">
-                <Input
-                  value={server1}
-                  onChange={(e) => setServer1(e.target.value)}
-                  placeholder="Servidor 2 (Opcional)"
-                />
-                <Input
-                  value={server2}
-                  onChange={(e) => setServer2(e.target.value)}
-                  placeholder="Servidor 3 (Opcional)"
-                />
-                <Input
-                  value={server3}
-                  onChange={(e) => setServer3(e.target.value)}
-                  placeholder="Servidor 4 (Opcional)"
-                />
+              <div className="grid gap-4">
+                <div className="flex gap-2">
+                  <Input
+                    value={server1}
+                    onChange={(e) => setServer1(e.target.value)}
+                    placeholder="Link Servidor 2"
+                    className="flex-[2]"
+                  />
+                  <Input
+                    value={server1Name}
+                    onChange={(e) => setServer1Name(e.target.value)}
+                    placeholder="Nombre (ej. Drive)"
+                    className="flex-1 text-xs"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={server2}
+                    onChange={(e) => setServer2(e.target.value)}
+                    placeholder="Link Servidor 3"
+                    className="flex-[2]"
+                  />
+                  <Input
+                    value={server2Name}
+                    onChange={(e) => setServer2Name(e.target.value)}
+                    placeholder="Nombre"
+                    className="flex-1 text-xs"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={server3}
+                    onChange={(e) => setServer3(e.target.value)}
+                    placeholder="Link Servidor 4"
+                    className="flex-[2]"
+                  />
+                  <Input
+                    value={server3Name}
+                    onChange={(e) => setServer3Name(e.target.value)}
+                    placeholder="Nombre"
+                    className="flex-1 text-xs"
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -725,8 +767,11 @@ export default function AdminPage() {
   const [episodeVideoFile, setEpisodeVideoFile] = useState<File | null>(null)
   const [episodeVideoUrl, setEpisodeVideoUrl] = useState("")
   const [episodeServer1, setEpisodeServer1] = useState("")
+  const [episodeServer1Name, setEpisodeServer1Name] = useState("")
   const [episodeServer2, setEpisodeServer2] = useState("")
+  const [episodeServer2Name, setEpisodeServer2Name] = useState("")
   const [episodeServer3, setEpisodeServer3] = useState("")
+  const [episodeServer3Name, setEpisodeServer3Name] = useState("")
   const [uploadType, setUploadType] = useState<"file" | "url">("file")
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState("")
@@ -808,9 +853,18 @@ export default function AdminPage() {
 
       // Build servers array if extra links are provided
       const servers: Server[] = []
-      if (episodeServer1) servers.push({ id: "s1", name: "Servidor 1", url: episodeServer1 })
-      if (episodeServer2) servers.push({ id: "s2", name: "Servidor 2", url: episodeServer2 })
-      if (episodeServer3) servers.push({ id: "s3", name: "Servidor 3", url: episodeServer3 })
+      const detectName = (url: string, providedName: string, fallback: string) => {
+        if (providedName) return providedName
+        if (url.includes("drive.google.com")) return "Google Drive"
+        if (url.includes("streamtape.com")) return "Streamtape"
+        if (url.includes("youtube.com") || url.includes("youtu.be")) return "YouTube"
+        if (url.includes("voe.sx")) return "Voe.sx"
+        return fallback
+      }
+
+      if (episodeServer1) servers.push({ id: "s1", name: detectName(episodeServer1, episodeServer1Name, "Servidor 2"), url: episodeServer1 })
+      if (episodeServer2) servers.push({ id: "s2", name: detectName(episodeServer2, episodeServer2Name, "Servidor 3"), url: episodeServer2 })
+      if (episodeServer3) servers.push({ id: "s3", name: detectName(episodeServer3, episodeServer3Name, "Servidor 4"), url: episodeServer3 })
 
       // Add episode with the video URL and extra servers
       addEpisode(selectedAnimeId, {
@@ -825,8 +879,11 @@ export default function AdminPage() {
       setEpisodeVideoFile(null)
       setEpisodeVideoUrl("")
       setEpisodeServer1("")
+      setEpisodeServer1Name("")
       setEpisodeServer2("")
+      setEpisodeServer2Name("")
       setEpisodeServer3("")
+      setEpisodeServer3Name("")
       setIsEpisodeSubmitting(false)
       setIsUploading(false)
       setUploadProgress("")
@@ -1263,26 +1320,56 @@ export default function AdminPage() {
 
                     {uploadType === "url" && (
                       <div className="space-y-4 pt-4 border-t border-border">
-                        <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
-                          <ServerIcon className="w-4 h-4 text-primary" />
-                          Servidores Opcionales
+                        <h3 className="text-sm font-medium text-foreground flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <ServerIcon className="w-4 h-4 text-primary" />
+                            Servidores Opcionales
+                          </div>
+                          <span className="text-[10px] font-normal text-muted-foreground bg-muted px-2 py-0.5 rounded">Auto-detección activa</span>
                         </h3>
-                        <div className="grid gap-3">
-                          <Input
-                            value={episodeServer1}
-                            onChange={(e) => setEpisodeServer1(e.target.value)}
-                            placeholder="Servidor 2 (Opcional)"
-                          />
-                          <Input
-                            value={episodeServer2}
-                            onChange={(e) => setEpisodeServer2(e.target.value)}
-                            placeholder="Servidor 3 (Opcional)"
-                          />
-                          <Input
-                            value={episodeServer3}
-                            onChange={(e) => setEpisodeServer3(e.target.value)}
-                            placeholder="Servidor 4 (Opcional)"
-                          />
+                        <div className="grid gap-4">
+                          <div className="flex gap-2">
+                            <Input
+                              value={episodeServer1}
+                              onChange={(e) => setEpisodeServer1(e.target.value)}
+                              placeholder="Link Servidor 2"
+                              className="flex-[2]"
+                            />
+                            <Input
+                              value={episodeServer1Name}
+                              onChange={(e) => setEpisodeServer1Name(e.target.value)}
+                              placeholder="Nombre (ej. Drive)"
+                              className="flex-1 text-xs"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <Input
+                              value={episodeServer2}
+                              onChange={(e) => setEpisodeServer2(e.target.value)}
+                              placeholder="Link Servidor 3"
+                              className="flex-[2]"
+                            />
+                            <Input
+                              value={episodeServer2Name}
+                              onChange={(e) => setEpisodeServer2Name(e.target.value)}
+                              placeholder="Nombre"
+                              className="flex-1 text-xs"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <Input
+                              value={episodeServer3}
+                              onChange={(e) => setEpisodeServer3(e.target.value)}
+                              placeholder="Link Servidor 4"
+                              className="flex-[2]"
+                            />
+                            <Input
+                              value={episodeServer3Name}
+                              onChange={(e) => setEpisodeServer3Name(e.target.value)}
+                              placeholder="Nombre"
+                              className="flex-1 text-xs"
+                            />
+                          </div>
                         </div>
                         <p className="text-[10px] text-muted-foreground">
                           * Los servidores vacíos no se mostrarán en la página de reproducción.
