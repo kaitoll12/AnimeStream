@@ -97,7 +97,7 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const addAnime = (anime: Omit<Anime, "id" | "episodes">) => {
+  const addAnime = async (anime: Omit<Anime, "id" | "episodes">) => {
     const newAnime: Anime = {
       ...anime,
       id: Date.now().toString(),
@@ -105,24 +105,24 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
     }
     const newState = [...animes, newAnime]
     setAnimes(newState)
-    saveToDB(newState)
+    await saveToDB(newState)
   }
 
-  const updateAnime = (id: string, anime: Partial<Omit<Anime, "id" | "episodes">>) => {
+  const updateAnime = async (id: string, anime: Partial<Omit<Anime, "id" | "episodes">>) => {
     const newState = animes.map((a) =>
       a.id === id ? { ...a, ...anime } : a
     )
     setAnimes(newState)
-    saveToDB(newState)
+    await saveToDB(newState)
   }
 
-  const deleteAnime = (id: string) => {
+  const deleteAnime = async (id: string) => {
     const newState = animes.filter((a) => a.id !== id)
     setAnimes(newState)
-    saveToDB(newState)
+    await saveToDB(newState)
   }
 
-  const addEpisode = (animeId: string, episode: Omit<Episode, "id">) => {
+  const addEpisode = async (animeId: string, episode: Omit<Episode, "id">) => {
     const newState = animes.map((anime) =>
       anime.id === animeId
         ? {
@@ -135,10 +135,10 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
         : anime
     )
     setAnimes(newState)
-    saveToDB(newState)
+    await saveToDB(newState)
   }
 
-  const updateEpisode = (animeId: string, episodeId: string, episode: Partial<Omit<Episode, "id">>) => {
+  const updateEpisode = async (animeId: string, episodeId: string, episode: Partial<Omit<Episode, "id">>) => {
     const newState = animes.map((anime) =>
       anime.id === animeId
         ? {
@@ -150,10 +150,10 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
         : anime
     )
     setAnimes(newState)
-    saveToDB(newState)
+    await saveToDB(newState)
   }
 
-  const deleteEpisode = (animeId: string, episodeId: string) => {
+  const deleteEpisode = async (animeId: string, episodeId: string) => {
     const newState = animes.map((anime) =>
       anime.id === animeId
         ? {
@@ -163,7 +163,7 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
         : anime
     )
     setAnimes(newState)
-    saveToDB(newState)
+    await saveToDB(newState)
   }
 
   const toggleFavorite = (animeId: string) => {
