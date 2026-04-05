@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { toast } from "sonner"
 
 export interface Episode {
   id: string
@@ -82,13 +83,17 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
 
   const saveToDB = async (newAnimes: Anime[]) => {
     try {
-      await fetch('/api/anime', {
+      const response = await fetch('/api/anime', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newAnimes)
       })
+      if (!response.ok) {
+        throw new Error('Error al guardar en la base de datos')
+      }
     } catch (error) {
       console.error('Error saving to DB:', error)
+      toast.error("No se pudo guardar en la nube. Verifica la conexión a Redis en Vercel.")
     }
   }
 
