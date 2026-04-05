@@ -230,11 +230,13 @@ export function VideoPlayer({ src, title, poster, onEnded }: VideoPlayerProps) {
 
     return (
       <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-border">
+        {/* Sandbox attribute helps block popups and ads from the iframe */}
         <iframe
           src={embedSrc}
           className="absolute inset-0 w-full h-full"
           allowFullScreen
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          sandbox="allow-forms allow-scripts allow-same-origin allow-presentation allow-pointer-lock"
         />
       </div>
     )
