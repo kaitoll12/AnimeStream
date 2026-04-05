@@ -217,6 +217,17 @@ export function VideoPlayer({ src, title, poster, onEnded }: VideoPlayerProps) {
       embedSrc = `https://www.youtube.com/embed/${id}`
     }
 
+    // Transform Streamtape links to embed links
+    if (src.includes("streamtape.com/v/")) {
+      embedSrc = src.replace("streamtape.com/v/", "streamtape.com/e/")
+    }
+
+    // Transform Voe.sx links to embed links
+    if (src.includes("voe.sx/") && !src.includes("/e/")) {
+      const id = src.split("voe.sx/")[1].split("?")[0]
+      embedSrc = `https://voe.sx/e/${id}`
+    }
+
     return (
       <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-border">
         <iframe
