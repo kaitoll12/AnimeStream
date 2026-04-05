@@ -319,6 +319,9 @@ function EditEpisodeModal({
   const [title, setTitle] = useState(episode.title)
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [videoUrl, setVideoUrl] = useState(episode.videoUrl)
+  const [server1, setServer1] = useState(episode.servers?.[0]?.url || "")
+  const [server2, setServer2] = useState(episode.servers?.[1]?.url || "")
+  const [server3, setServer3] = useState(episode.servers?.[2]?.url || "")
   const [uploadType, setUploadType] = useState<"file" | "url">(
     episode.videoUrl.startsWith("http") && !episode.videoUrl.includes("vercel-storage.com") ? "url" : "file"
   )
@@ -351,10 +354,17 @@ function EditEpisodeModal({
       return
     }
 
+    // Build servers array
+    const servers: Server[] = []
+    if (server1) servers.push({ id: "s1", name: "Servidor 1", url: server1 })
+    if (server2) servers.push({ id: "s2", name: "Servidor 2", url: server2 })
+    if (server3) servers.push({ id: "s3", name: "Servidor 3", url: server3 })
+
     onSave({
       number: parseInt(number),
       title,
       videoUrl: finalVideoUrl,
+      servers: servers.length > 0 ? servers : undefined
     })
   }
 
@@ -477,11 +487,37 @@ function EditEpisodeModal({
               <Input
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://ejemplo.com/video.mp4 o link de Drive"
+                placeholder="Link Principal (Drive, YouTube, etc.)"
                 required
               />
             )}
           </div>
+
+          {uploadType === "url" && (
+            <div className="space-y-4 pt-4 border-t border-border">
+              <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
+                <ServerIcon className="w-4 h-4 text-primary" />
+                Servidores Opcionales
+              </h3>
+              <div className="grid gap-3">
+                <Input
+                  value={server1}
+                  onChange={(e) => setServer1(e.target.value)}
+                  placeholder="Servidor 2 (Opcional)"
+                />
+                <Input
+                  value={server2}
+                  onChange={(e) => setServer2(e.target.value)}
+                  placeholder="Servidor 3 (Opcional)"
+                />
+                <Input
+                  value={server3}
+                  onChange={(e) => setServer3(e.target.value)}
+                  placeholder="Servidor 4 (Opcional)"
+                />
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={onClose} className="flex-1" disabled={isUploading}>
