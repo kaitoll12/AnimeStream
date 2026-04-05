@@ -1,14 +1,14 @@
 "use client"
 
-import { use, useMemo } from "react"
+import { use, useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useAnime } from "@/context/anime-context"
+import { useAnime, type Server } from "@/context/anime-context"
 import { Navbar } from "@/components/navbar"
 import { VideoPlayer } from "@/components/video-player"
 import { EpisodeCard } from "@/components/episode-card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, ChevronLeft, ChevronRight, Server as ServerIcon } from "lucide-react"
 
 interface WatchPageProps {
   params: Promise<{ animeId: string; episodeId: string }>
@@ -23,6 +23,15 @@ export default function WatchPage({ params }: WatchPageProps) {
   const currentEpisode = useMemo(() => {
     return anime?.episodes.find((ep) => ep.id === episodeId)
   }, [anime, episodeId])
+
+  const [currentServer, setCurrentServer] = useState<string | null>(null)
+
+  const videoSrc = useMemo(() => {
+    if (!currentEpisode) return ""
+    if (!currentServer) return currentEpisode.videoUrl
+    const server = currentEpisode.servers?.find(s => s.id === currentServer)
+    return server ? server.url : currentEpisode.videoUrl
+  }, [currentEpisode, currentServer])
 
   const episodeIndex = useMemo(() => {
     return anime?.episodes.findIndex((ep) => ep.id === episodeId) ?? -1
@@ -74,12 +83,45 @@ export default function WatchPage({ params }: WatchPageProps) {
         <div className="bg-black">
           <div className="max-w-7xl mx-auto">
             <VideoPlayer
-              src={currentEpisode.videoUrl}
+              src={videoSrc}
               title={`${anime.title} - Episode ${currentEpisode.number}: ${currentEpisode.title}`}
               onEnded={handleEpisodeEnd}
             />
           </div>
         </div>
+
+        {/* Server Selector */}
+        {(currentEpisode.servers && currentEpisode.servers.length > 0) && (
+          <div className="max-w-7xl mx-auto px-4 mt-4">
+            <div className="flex items-center gap-3 bg-card border border-border rounded-xl p-3 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-2 px-3 border-r border-border shrink-0">
+                <ServerIcon className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium text-foreground whitespace-nowrap">Servers:</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={currentServer === null ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentServer(null)}
+                  className="whitespace-nowrap"
+                >
+                  Principal
+                </Button>
+                {currentEpisode.servers.map((server) => (
+                  <Button
+                    key={server.id}
+                    variant={currentServer === server.id ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentServer(server.id)}
+                    className="whitespace-nowrap"
+                  >
+                    {server.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Info Section */}
         <div className="max-w-7xl mx-auto px-4 mt-6">

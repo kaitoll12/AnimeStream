@@ -3,11 +3,18 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { toast } from "sonner"
 
+export interface Server {
+  id: string
+  name: string
+  url: string
+}
+
 export interface Episode {
   id: string
   number: number
   title: string
-  videoUrl: string
+  videoUrl: string // Default/Primary server
+  servers?: Server[]
   thumbnail?: string
 }
 
