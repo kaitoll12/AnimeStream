@@ -34,6 +34,7 @@ import {
   ChevronUp,
   Upload,
   Loader2,
+  Server as ServerIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
