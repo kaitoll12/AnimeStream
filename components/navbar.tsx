@@ -34,19 +34,16 @@ export function Navbar({ onSearch }: NavbarProps) {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative w-10 h-10 group-hover:scale-105 transition-transform">
+          <Link href="/" className="flex items-center group">
+            <div className="relative w-32 h-10 group-hover:scale-105 transition-transform">
               <Image
                 src="/logo.png"
-                alt="Aniflex Logo"
+                alt="Aniflex"
                 fill
-                className="object-contain"
+                className="object-contain object-left"
                 priority
               />
             </div>
-            <span className="text-xl font-bold text-foreground hidden sm:block">
-              Aniflex
-            </span>
           </Link>
 
           {/* Desktop Navigation */}
