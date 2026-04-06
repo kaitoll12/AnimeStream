@@ -9,8 +9,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'AnimeStream - Watch Your Favorite Anime',
-  description: 'Stream your favorite anime series and movies in high quality. Watch popular anime like Attack on Titan, Demon Slayer, and more.',
+  title: 'Aniflex - Watch Your Favorite Anime',
+  description: 'Streaming platform for anime lovers',
   generator: 'v0.app',
   icons: {
     icon: [

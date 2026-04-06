@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -34,11 +35,17 @@ export function Navbar({ onSearch }: NavbarProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Play className="w-5 h-5 text-primary-foreground fill-current" />
+            <div className="relative w-10 h-10 group-hover:scale-105 transition-transform">
+              <Image
+                src="/logo.png"
+                alt="Aniflex Logo"
+                fill
+                className="object-contain"
+                priority
+              />
             </div>
             <span className="text-xl font-bold text-foreground hidden sm:block">
-              AnimeStream
+              Aniflex
             </span>
           </Link>
 

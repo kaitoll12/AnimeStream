@@ -81,7 +81,7 @@ export default function CategoriesPage() {
       <footer className="border-t border-border py-8 mt-12">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-muted-foreground text-sm">
-            AnimeStream - Your favorite anime streaming platform
+            Aniflex - Your favorite anime streaming platform
           </p>
         </div>
       </footer>

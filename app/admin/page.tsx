@@ -940,7 +940,7 @@ export default function AdminPage() {
                 Volver al inicio
               </Button>
             </Link>
-            <h1 className="text-3xl font-bold text-foreground">Panel de Administración</h1>
+            <h1 className="text-3xl font-bold text-foreground">Panel de Administración de Aniflex</h1>
             <p className="text-muted-foreground mt-1">
               Administra tu colección de anime y episodios
             </p>
