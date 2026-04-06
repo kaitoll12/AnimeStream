@@ -35,7 +35,7 @@ export function Navbar({ onSearch }: NavbarProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center group">
-            <div className="relative w-32 h-10 group-hover:scale-105 transition-transform">
+            <div className="relative w-40 h-14 group-hover:scale-105 transition-transform">
               <Image
                 src="/logo.png"
                 alt="Aniflex"
