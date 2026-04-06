@@ -64,13 +64,13 @@ export default function HomePage() {
 
       {/* Hero Section */}
       {featuredAnime && !searchQuery && selectedCategory === "All" && (
-        <div className="pt-16">
+        <div className="pt-20">
           <HeroSection anime={featuredAnime} />
         </div>
       )}
 
       {/* Main Content */}
-      <div className={`max-w-7xl mx-auto px-4 ${featuredAnime && !searchQuery && selectedCategory === "All" ? "py-12" : "pt-24 pb-12"}`}>
+      <div className={`max-w-7xl mx-auto px-4 ${featuredAnime && !searchQuery && selectedCategory === "All" ? "py-12" : "pt-28 pb-12"}`}>
         {/* Search Results */}
         {searchQuery && (
           <section className="mb-12">

@@ -24,7 +24,7 @@ export default function AnimeDetailPage({ params }: AnimeDetailPageProps) {
     return (
       <main className="min-h-screen bg-background">
         <Navbar />
-        <div className="pt-24 px-4 max-w-7xl mx-auto">
+        <div className="pt-28 px-4 max-w-7xl mx-auto">
           <div className="text-center py-20">
             <h1 className="text-3xl font-bold text-foreground mb-4">Anime Not Found</h1>
             <p className="text-muted-foreground mb-6">The anime you are looking for does not exist.</p>
@@ -58,7 +58,7 @@ export default function AnimeDetailPage({ params }: AnimeDetailPageProps) {
         </div>
 
         {/* Back Button */}
-        <div className="relative pt-20 px-4 max-w-7xl mx-auto">
+        <div className="relative pt-24 px-4 max-w-7xl mx-auto">
           <Link href="/">
             <Button variant="ghost" size="sm" className="gap-2">
               <ArrowLeft className="w-4 h-4" />

@@ -940,8 +940,8 @@ export default function AdminPage() {
                 Volver al inicio
               </Button>
             </Link>
-            <div className="flex items-center mb-4">
-              <div className="relative w-56 h-20">
+            <div className="flex items-center mb-6">
+              <div className="relative w-72 h-28">
                 <Image
                   src="/logo.png"
                   alt="Aniflex"

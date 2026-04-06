@@ -51,7 +51,7 @@ export default function WatchPage({ params }: WatchPageProps) {
     return (
       <main className="min-h-screen bg-background">
         <Navbar />
-        <div className="pt-24 px-4 max-w-7xl mx-auto">
+        <div className="pt-28 px-4 max-w-7xl mx-auto">
           <div className="text-center py-20">
             <h1 className="text-3xl font-bold text-foreground mb-4">
               Episode Not Found
@@ -78,7 +78,7 @@ export default function WatchPage({ params }: WatchPageProps) {
     <main className="min-h-screen bg-background">
       <Navbar />
 
-      <div className="pt-20 pb-12">
+      <div className="pt-24 pb-12">
         {/* Video Player Section */}
         <div className="bg-black">
           <div className="max-w-7xl mx-auto">
