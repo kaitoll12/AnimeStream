@@ -32,10 +32,10 @@ export function Navbar({ onSearch }: NavbarProps) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-28">
           {/* Logo */}
           <Link href="/" className="flex items-center group">
-            <div className="relative w-52 h-16 group-hover:scale-105 transition-transform">
+            <div className="relative w-80 h-40 group-hover:scale-105 transition-transform">
               <Image
                 src="/logo.png"
                 alt="Aniflex"

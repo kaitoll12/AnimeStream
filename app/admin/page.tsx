@@ -940,16 +940,7 @@ export default function AdminPage() {
                 Volver al inicio
               </Button>
             </Link>
-            <div className="flex items-center mb-6">
-              <div className="relative w-72 h-28">
-                <Image
-                  src="/logo.png"
-                  alt="Aniflex"
-                  fill
-                  className="object-contain object-left"
-                  priority
-                />
-              </div>
+            <div className="flex items-center mb-8">
             </div>
             <p className="text-muted-foreground mt-1">
               Administra tu colección de anime y episodios

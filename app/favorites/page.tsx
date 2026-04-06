@@ -19,7 +19,7 @@ export default function FavoritesPage() {
     <main className="min-h-screen bg-background">
       <Navbar />
 
-      <div className="pt-28 pb-12 px-4 max-w-7xl mx-auto">
+      <div className="pt-36 pb-12 px-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <Heart className="w-8 h-8 text-red-500 fill-current" />
           <h1 className="text-3xl font-bold text-foreground">My Favorites</h1>
