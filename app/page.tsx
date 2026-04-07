@@ -9,15 +9,22 @@ import { CategoryFilter } from "@/components/category-filter"
 import { TrendingUp, Clock, Sparkles } from "lucide-react"
 
 const ALL_CATEGORIES = [
-  "All",
-  "Action",
+  "Todos",
+  "Acción",
   "Romance",
   "Shonen",
   "Drama",
-  "Fantasy",
-  "Supernatural",
-  "Adventure",
-  "School",
+  "Fantasia",
+  "Sobrenatural",
+  "Aventura",
+  "Escolares",
+  "Ecchi",
+  "Ciencia Ficción",
+  "Deportes",
+  "Misterio",
+  "Seinen",
+  "Shoujo",
+  "Artes Marciales",
 ]
 
 export default function HomePage() {
@@ -89,7 +96,7 @@ export default function HomePage() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">No results found for &quot;{searchQuery}&quot;</p>
+                <p className="text-muted-foreground">No hay resultados para &quot;{searchQuery}&quot;</p>
               </div>
             )}
           </section>
@@ -101,7 +108,7 @@ export default function HomePage() {
             <section className="mb-12">
               <div className="flex items-center gap-3 mb-6">
                 <Sparkles className="w-6 h-6 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">Browse by Category</h2>
+                <h2 className="text-2xl font-bold text-foreground">Filtrar por Categoría</h2>
               </div>
               <CategoryFilter
                 categories={ALL_CATEGORIES}
@@ -136,7 +143,7 @@ export default function HomePage() {
                 <section className="mb-12">
                   <div className="flex items-center gap-3 mb-6">
                     <TrendingUp className="w-6 h-6 text-primary" />
-                    <h2 className="text-2xl font-bold text-foreground">Popular Anime</h2>
+                    <h2 className="text-2xl font-bold text-foreground">Animes Populares</h2>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                     {popularAnimes.map((anime) => (
@@ -153,7 +160,7 @@ export default function HomePage() {
                 <section className="mb-12">
                   <div className="flex items-center gap-3 mb-6">
                     <Clock className="w-6 h-6 text-primary" />
-                    <h2 className="text-2xl font-bold text-foreground">Latest Episodes</h2>
+                    <h2 className="text-2xl font-bold text-foreground">Últimos Episodios</h2>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                     {latestEpisodes.map((anime) => (
@@ -168,7 +175,7 @@ export default function HomePage() {
 
                 {/* All Anime */}
                 <section>
-                  <h2 className="text-2xl font-bold text-foreground mb-6">All Anime</h2>
+                  <h2 className="text-2xl font-bold text-foreground mb-6">Catálogo de Animes</h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                     {animes.map((anime) => (
                       <AnimeCard
@@ -189,7 +196,7 @@ export default function HomePage() {
       <footer className="border-t border-border py-8 mt-12">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-muted-foreground text-sm">
-            Aniflex - Your favorite anime streaming platform
+            Aniflex - Plataforma de Anime
           </p>
         </div>
       </footer>

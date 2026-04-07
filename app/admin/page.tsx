@@ -39,17 +39,24 @@ import {
 import { cn } from "@/lib/utils"
 
 const ALL_CATEGORIES = [
-  "Action",
+  "Acción",
   "Romance",
   "Shonen",
   "Drama",
-  "Fantasy",
-  "Supernatural",
-  "Adventure",
-  "School",
-  "Comedy",
+  "Fantasía",
+  "Sobrenatural",
+  "Aventura",
+  "Escolares",
+  "Comedia",
   "Horror",
   "Slice of Life",
+  "Ecchi",
+  "Ciencia Ficción",
+  "Deportes",
+  "Misterio",
+  "Seinen",
+  "Shoujo",
+  "Artes Marciales",
 ]
 
 type Tab = "animes" | "add-anime" | "add-episode"
