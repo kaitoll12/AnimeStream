@@ -9,8 +9,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Aniflex - Watch Your Favorite Anime',
-  description: 'Streaming platform for anime lovers',
+  title: 'Aniflex - Streaming de Anime',
+  description: 'Animes semanales',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
         media: '(prefers-color-scheme: dark)',
       },
       {
-        url: '/icon.svg',
+        url: '/icono.png',
         type: 'image/svg+xml',
       },
     ],
