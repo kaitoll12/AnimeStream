@@ -49,9 +49,9 @@ export default function RootLayout({
         <AdminAuthProvider>
           <AnimeProvider>
             {children}
+            <MikuChat />
           </AnimeProvider>
         </AdminAuthProvider>
-        <MikuChat />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
