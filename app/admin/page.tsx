@@ -176,6 +176,7 @@ function EditAnimeModal({
   const [bannerUrl, setBannerUrl] = useState(anime.bannerUrl || "")
   const [rating, setRating] = useState(anime.rating?.toString() || "")
   const [categories, setCategories] = useState<string[]>(anime.categories)
+  const [status, setStatus] = useState<"En emisión" | "Finalizado">(anime.status || "En emisión")
 
   const toggleCategory = (category: string) => {
     setCategories((prev) =>
@@ -194,6 +195,7 @@ function EditAnimeModal({
       bannerUrl: bannerUrl || undefined,
       rating: rating ? parseFloat(rating) : undefined,
       categories,
+      status,
     })
   }
 
@@ -266,6 +268,21 @@ function EditAnimeModal({
               max="10"
               step="0.1"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Estado *
+            </label>
+            <Select value={status} onValueChange={(v: "En emisión" | "Finalizado") => setStatus(v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona el estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="En emisión">En emisión</SelectItem>
+                <SelectItem value="Finalizado">Finalizado</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
@@ -764,6 +781,7 @@ export default function AdminPage() {
   const [animeBannerUrl, setAnimeBannerUrl] = useState("")
   const [animeRating, setAnimeRating] = useState("")
   const [animeCategories, setAnimeCategories] = useState<string[]>([])
+  const [animeStatus, setAnimeStatus] = useState<"En emisión" | "Finalizado">("En emisión")
   const [isAnimeSubmitting, setIsAnimeSubmitting] = useState(false)
   const [animeSuccess, setAnimeSuccess] = useState(false)
 
@@ -819,6 +837,7 @@ export default function AdminPage() {
         bannerUrl: animeBannerUrl,
         rating: animeRating ? parseFloat(animeRating) : undefined,
         categories: animeCategories,
+        status: animeStatus,
       })
 
       setAnimeTitle("")
@@ -827,6 +846,7 @@ export default function AdminPage() {
       setAnimeBannerUrl("")
       setAnimeRating("")
       setAnimeCategories([])
+      setAnimeStatus("En emisión")
       setIsAnimeSubmitting(false)
       setAnimeSuccess(true)
 
@@ -1120,6 +1140,21 @@ export default function AdminPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
+                    Estado *
+                  </label>
+                  <Select value={animeStatus} onValueChange={(v: "En emisión" | "Finalizado") => setAnimeStatus(v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona el estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="En emisión">En emisión</SelectItem>
+                      <SelectItem value="Finalizado">Finalizado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Categorías *
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -1207,7 +1242,7 @@ export default function AdminPage() {
                           <SelectValue placeholder="Selecciona un anime" />
                         </SelectTrigger>
                         <SelectContent>
-                          {animes.map((anime) => (
+                          {animes.filter(a => a.status !== "Finalizado").map((anime) => (
                             <SelectItem key={anime.id} value={anime.id}>
                               {anime.title}
                             </SelectItem>

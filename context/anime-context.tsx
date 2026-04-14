@@ -28,6 +28,7 @@ export interface Anime {
   rating?: number
   episodes: Episode[]
   isFavorite?: boolean
+  status?: "En emisión" | "Finalizado"
 }
 
 interface AnimeContextType {

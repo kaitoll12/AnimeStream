@@ -171,6 +171,13 @@ export default function AnimeDetailPage({ params }: AnimeDetailPageProps) {
                 </dd>
               </div>
               <div>
+                <dt className="text-sm text-muted-foreground">Estado</dt>
+                <dd className="text-foreground font-medium flex items-center gap-2">
+                  {anime.status || "En emisión"}
+                  <span className={cn("w-2 h-2 rounded-full", anime.status === "Finalizado" ? "bg-red-500" : "bg-green-500")} />
+                </dd>
+              </div>
+              <div>
                 <dt className="text-sm text-muted-foreground">Categories</dt>
                 <dd className="flex flex-wrap gap-1 mt-1">
                   {anime.categories.map((cat) => (
