@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { AnimeProvider } from '@/context/anime-context'
 import { AdminAuthProvider } from '@/context/admin-auth-context'
+import { MikuChat } from '@/components/miku-chat'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -50,6 +51,7 @@ export default function RootLayout({
             {children}
           </AnimeProvider>
         </AdminAuthProvider>
+        <MikuChat />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
