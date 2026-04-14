@@ -1,10 +1,12 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo } from "react"
 import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport, UIMessage } from "ai"
 import { motion, AnimatePresence } from "framer-motion"
 import { MessageCircle, X, Send, User, Bot, Loader2, ArrowLeft } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { useAnime } from "@/context/anime-context"
 
 type Waifu = 'miku' | 'rem' | 'reze' | null;
 
@@ -127,6 +129,57 @@ function WaifuSelector({ onSelect, onClose }: { onSelect: (w: Waifu) => void, on
 function ChatEngine({ waifu, onBack, onClose }: { waifu: Exclude<Waifu, null>, onBack: () => void, onClose: () => void }) {
   const [input, setInput] = useState("")
   const info = WAIFU_INFO[waifu];
+  const pathname = usePathname();
+  const { getAnimeById } = useAnime();
+
+  const initialGreeting = useMemo(() => {
+    let greeting = info.greeting;
+    if (pathname.startsWith('/watch/')) {
+      const segments = pathname.split('/');
+      const animeId = segments[2];
+      const anime = getAnimeById(animeId);
+      if (anime) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('last_viewed_anime', JSON.stringify({ id: anime.id, title: anime.title }));
+        }
+        if (waifu === 'miku') return `Veo que estás viendo un capítulo de ${anime.title}, tutor. Cuéntame qué te pareció cuando lo termines...`;
+        if (waifu === 'rem') return `Ese capítulo de ${anime.title} se ve interesante... dime qué te pareció cuando acabe.`;
+        if (waifu === 'reze') return `Vaya, viendo ${anime.title}... espero tus comentarios sobre el capítulo cuando termine.`;
+      }
+    } else if (pathname.startsWith('/anime/')) {
+      const segments = pathname.split('/');
+      const animeId = segments[2];
+      const anime = getAnimeById(animeId);
+      if (anime) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('last_viewed_anime', JSON.stringify({ id: anime.id, title: anime.title }));
+        }
+        if (waifu === 'miku') return `Ese anime (${anime.title}) tiene buen ritmo... si te gusta, tutor, podrías ver algo parecido que te puedo recomendar.`;
+        if (waifu === 'rem') return `Ese anime (${anime.title}) es muy bueno... ¿quieres que Rem te busque algo similar?`;
+        if (waifu === 'reze') return `Vaya, ${anime.title} no está mal... si te gusta, podría tener algo mejor para ti.`;
+      }
+    } else if (pathname === '/') {
+      let lastViewed = null;
+      if (typeof window !== 'undefined') {
+         try {
+           lastViewed = JSON.parse(localStorage.getItem('last_viewed_anime') || 'null');
+         } catch(e) {
+           const raw = localStorage.getItem('last_viewed_anime');
+           if (raw && !raw.startsWith('{')) lastViewed = { title: raw };
+         }
+      }
+      if (lastViewed) {
+         if (waifu === 'miku') return `Tutor, vi que estabas viendo ${lastViewed.title}... ¿te gustaría reanudarlo?`;
+         if (waifu === 'rem') return `Noto que dejaste pendiente ${lastViewed.title}... ¿quieres retomar el anime o prefieres otra recomendación?`;
+         if (waifu === 'reze') return `¿Pensando en ${lastViewed.title}? Deberías reanudarlo antes de ver otra cosa.`;
+      } else {
+         if (waifu === 'miku') return "No has visto nada hoy... ¿quieres que te recomiende algo, tutor?";
+         if (waifu === 'rem') return "Aún no has visto nada hoy... ¿quieres que Rem te recomiende el mejor anime?";
+         if (waifu === 'reze') return "No has visto nada hoy... ¿qué te parece si te recomiendo algo para pasar el rato?";
+      }
+    }
+    return greeting;
+  }, [pathname, waifu, getAnimeById, info.greeting]);
   
   const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({ api: `/api/waifu?char=${waifu}` }),
@@ -134,7 +187,7 @@ function ChatEngine({ waifu, onBack, onClose }: { waifu: Exclude<Waifu, null>, o
       {
         id: "start-1",
         role: "assistant",
-        parts: [{ type: "text", text: info.greeting }],
+        parts: [{ type: "text", text: initialGreeting }],
       } as unknown as UIMessage,
     ],
   })
