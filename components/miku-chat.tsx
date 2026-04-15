@@ -69,23 +69,18 @@ export function MikuChat() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-6 right-6 w-[350px] sm:w-[400px] h-[500px] max-h-[80vh] bg-card border border-border shadow-2xl rounded-2xl flex flex-col z-50 overflow-hidden"
-          >
-             {!selectedWaifu ? (
-                <WaifuSelector onSelect={setSelectedWaifu} onClose={() => setIsOpen(false)} />
-             ) : (
-                <ChatEngine waifu={selectedWaifu!} onBack={() => setSelectedWaifu(null)} onClose={() => setIsOpen(false)} />
-             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <motion.div
+        initial={false}
+        animate={isOpen ? { opacity: 1, y: 0, scale: 1, pointerEvents: "auto" } : { opacity: 0, y: 20, scale: 0.95, pointerEvents: "none" }}
+        transition={{ duration: 0.2 }}
+        className="fixed bottom-6 right-6 w-[350px] sm:w-[400px] h-[500px] max-h-[80vh] bg-card border border-border shadow-2xl rounded-2xl flex flex-col z-50 overflow-hidden"
+      >
+         {!selectedWaifu ? (
+            <WaifuSelector onSelect={setSelectedWaifu} onClose={() => setIsOpen(false)} />
+         ) : (
+            <ChatEngine waifu={selectedWaifu!} onBack={() => setSelectedWaifu(null)} onClose={() => setIsOpen(false)} />
+         )}
+      </motion.div>
     </>
   )
 }

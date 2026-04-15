@@ -5,11 +5,12 @@ import { useAnime } from "@/context/anime-context"
 import { Navbar } from "@/components/navbar"
 import { HeroSection } from "@/components/hero-section"
 import { AnimeCard } from "@/components/anime-card"
+import { LatestEpisodeCard } from "@/components/latest-episode-card"
 import { CategoryFilter } from "@/components/category-filter"
 import { TrendingUp, Clock, Sparkles } from "lucide-react"
 
 const ALL_CATEGORIES = [
-  "Todos",
+  "All",
   "Acción",
   "Romance",
   "Shonen",
@@ -53,9 +54,12 @@ export default function HomePage() {
 
   const latestEpisodes = useMemo(() => {
     return animes
-      .filter((a) => a.episodes.length > 0)
-      .sort((a, b) => b.episodes.length - a.episodes.length)
-      .slice(0, 6)
+      .filter((a) => a.status === "En emisión" && a.episodes.length > 0)
+      .map((anime) => ({
+        anime,
+        episode: anime.episodes[anime.episodes.length - 1],
+      }))
+      .slice(0, 8)
   }, [animes])
 
   const handleSearch = (query: string) => {
@@ -162,12 +166,12 @@ export default function HomePage() {
                     <Clock className="w-6 h-6 text-primary" />
                     <h2 className="text-2xl font-bold text-foreground">Últimos Episodios</h2>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                    {latestEpisodes.map((anime) => (
-                      <AnimeCard
-                        key={anime.id}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {latestEpisodes.map(({ anime, episode }) => (
+                      <LatestEpisodeCard
+                        key={`${anime.id}-${episode.id}`}
                         anime={anime}
-                        onToggleFavorite={toggleFavorite}
+                        episode={episode}
                       />
                     ))}
                   </div>
