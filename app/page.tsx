@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useAnime } from "@/context/anime-context"
 import { Navbar } from "@/components/navbar"
 import { HeroSection } from "@/components/hero-section"
@@ -32,6 +32,11 @@ export default function HomePage() {
   const { animes, toggleFavorite, searchAnimes, filterByCategory } = useAnime()
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [searchQuery, setSearchQuery] = useState("")
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const featuredAnime = useMemo(() => {
     const topRated = [...animes].sort((a, b) => (b.rating || 0) - (a.rating || 0))
@@ -53,8 +58,9 @@ export default function HomePage() {
   }, [animes])
 
   const latestEpisodes = useMemo(() => {
+    if (!animes || animes.length === 0) return []
     return animes
-      .filter((a) => a.status === "En emisión" && a.episodes.length > 0)
+      .filter((a) => a.status === "En emisión" && a.episodes && a.episodes.length > 0)
       .map((anime) => ({
         anime,
         episode: anime.episodes[anime.episodes.length - 1],
@@ -67,6 +73,10 @@ export default function HomePage() {
     if (query) {
       setSelectedCategory("All")
     }
+  }
+
+  if (!mounted) {
+    return null
   }
 
   return (
@@ -144,38 +154,42 @@ export default function HomePage() {
             ) : (
               <>
                 {/* Popular Section */}
-                <section className="mb-12">
-                  <div className="flex items-center gap-3 mb-6">
-                    <TrendingUp className="w-6 h-6 text-primary" />
-                    <h2 className="text-2xl font-bold text-foreground">Animes Populares</h2>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                    {popularAnimes.map((anime) => (
-                      <AnimeCard
-                        key={anime.id}
-                        anime={anime}
-                        onToggleFavorite={toggleFavorite}
-                      />
-                    ))}
-                  </div>
-                </section>
+                {popularAnimes.length > 0 && (
+                  <section className="mb-12">
+                    <div className="flex items-center gap-3 mb-6">
+                      <TrendingUp className="w-6 h-6 text-primary" />
+                      <h2 className="text-2xl font-bold text-foreground">Animes Populares</h2>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                      {popularAnimes.map((anime) => (
+                        <AnimeCard
+                          key={anime.id}
+                          anime={anime}
+                          onToggleFavorite={toggleFavorite}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                )}
 
                 {/* Latest Episodes */}
-                <section className="mb-12">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Clock className="w-6 h-6 text-primary" />
-                    <h2 className="text-2xl font-bold text-foreground">Últimos Episodios</h2>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {latestEpisodes.map(({ anime, episode }) => (
-                      <LatestEpisodeCard
-                        key={`${anime.id}-${episode.id}`}
-                        anime={anime}
-                        episode={episode}
-                      />
-                    ))}
-                  </div>
-                </section>
+                {latestEpisodes.length > 0 && (
+                  <section className="mb-12">
+                    <div className="flex items-center gap-3 mb-6">
+                      <Clock className="w-6 h-6 text-primary" />
+                      <h2 className="text-2xl font-bold text-foreground">Últimos Episodios</h2>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                      {latestEpisodes.map(({ anime, episode }) => (
+                        <LatestEpisodeCard
+                          key={`${anime.id}-${episode.id}`}
+                          anime={anime}
+                          episode={episode}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                )}
 
                 {/* All Anime */}
                 <section>
