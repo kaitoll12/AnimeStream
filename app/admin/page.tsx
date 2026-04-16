@@ -59,7 +59,7 @@ const ALL_CATEGORIES = [
   "Artes Marciales",
 ]
 
-type Tab = "animes" | "add-anime" | "add-episode"
+type Tab = "animes" | "add-anime" | "add-episode" | "add-episode-bulk"
 
 function LoginForm() {
   const { login } = useAdminAuth()
@@ -770,7 +770,7 @@ function AnimeAdminCard({
 }
 
 export default function AdminPage() {
-  const { animes, addAnime, updateAnime, deleteAnime, addEpisode, updateEpisode, deleteEpisode } = useAnime()
+  const { animes, addAnime, updateAnime, deleteAnime, addEpisode, addBulkEpisodes, updateEpisode, deleteEpisode } = useAnime()
   const { isLoggedIn, logout } = useAdminAuth()
   const [activeTab, setActiveTab] = useState<Tab>("animes")
 
@@ -803,6 +803,17 @@ export default function AdminPage() {
   const [isEpisodeSubmitting, setIsEpisodeSubmitting] = useState(false)
   const [episodeSuccess, setEpisodeSuccess] = useState(false)
   const [episodeError, setEpisodeError] = useState("")
+
+  // Add Bulk Episode Form State
+  const [bulkAnimeId, setBulkAnimeId] = useState("")
+  const [bulkStartNumber, setBulkStartNumber] = useState("1")
+  const [bulkServer1, setBulkServer1] = useState("")
+  const [bulkServer2, setBulkServer2] = useState("")
+  const [bulkServer3, setBulkServer3] = useState("")
+  const [bulkServer4, setBulkServer4] = useState("")
+  const [isBulkSubmitting, setIsBulkSubmitting] = useState(false)
+  const [bulkSuccess, setBulkSuccess] = useState(false)
+  const [bulkError, setBulkError] = useState("")
 
   // Edit Modal State
   const [editingAnime, setEditingAnime] = useState<Anime | null>(null)
@@ -925,6 +936,72 @@ export default function AdminPage() {
     }
   }
 
+  const handleAddBulkEpisodes = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsBulkSubmitting(true)
+    setBulkError("")
+
+    try {
+      const s1Links = bulkServer1.split("\n").map(l => l.trim()).filter(l => l !== "")
+      const s2Links = bulkServer2.split("\n").map(l => l.trim()).filter(l => l !== "")
+      const s3Links = bulkServer3.split("\n").map(l => l.trim()).filter(l => l !== "")
+      const s4Links = bulkServer4.split("\n").map(l => l.trim()).filter(l => l !== "")
+
+      if (s1Links.length === 0) {
+        throw new Error("Agrega al menos una URL en el Servidor Principal.")
+      }
+
+      const detectName = (url: string, defaultName: string) => {
+        if (!url) return defaultName
+        if (url.includes("drive.google.com")) return "Google Drive"
+        if (url.includes("streamtape.com")) return "Streamtape"
+        if (url.includes("youtube.com") || url.includes("youtu.be")) return "YouTube"
+        if (url.includes("voe.sx")) return "Voe.sx"
+        return defaultName
+      }
+
+      const startNum = parseInt(bulkStartNumber) || 1
+
+      const episodesToAdd = s1Links.map((url1, index) => {
+        const number = startNum + index
+        const servers: Server[] = []
+
+        const url2 = s2Links[index]
+        const url3 = s3Links[index]
+        const url4 = s4Links[index]
+
+        if (url2) servers.push({ id: "s1", name: detectName(url2, "Servidor 2"), url: url2 })
+        if (url3) servers.push({ id: "s2", name: detectName(url3, "Servidor 3"), url: url3 })
+        if (url4) servers.push({ id: "s3", name: detectName(url4, "Servidor 4"), url: url4 })
+
+        return {
+          number,
+          title: "",
+          videoUrl: url1,
+          servers: servers.length > 0 ? servers : undefined
+        }
+      })
+
+      await addBulkEpisodes(bulkAnimeId, episodesToAdd)
+      
+      setBulkServer1("")
+      setBulkServer2("")
+      setBulkServer3("")
+      setBulkServer4("")
+      // Auto increment start number for next batch
+      setBulkStartNumber((startNum + episodesToAdd.length).toString())
+
+      setIsBulkSubmitting(false)
+      setBulkSuccess(true)
+
+      setTimeout(() => setBulkSuccess(false), 3000)
+
+    } catch (error) {
+      setBulkError(error instanceof Error ? error.message : "Error al procesar los episodios")
+      setIsBulkSubmitting(false)
+    }
+  }
+
   const handleUpdateAnime = (data: Partial<Omit<Anime, "id" | "episodes">>) => {
     if (editingAnime) {
       updateAnime(editingAnime.id, data)
@@ -1008,6 +1085,14 @@ export default function AdminPage() {
           >
             <Film className="w-4 h-4" />
             Agregar Episodio
+          </Button>
+          <Button
+            variant={activeTab === "add-episode-bulk" ? "default" : "ghost"}
+            onClick={() => setActiveTab("add-episode-bulk")}
+            className="gap-2"
+          >
+            <ServerIcon className="w-4 h-4" />
+            Añadir Varios Episodios
           </Button>
         </div>
 
@@ -1445,6 +1530,162 @@ export default function AdminPage() {
                         </>
                       ) : (
                         "Agregar Episodio"
+                      )}
+                    </Button>
+                  </form>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "add-episode-bulk" && (
+          <div className="max-w-4xl">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                Añadir Varios Episodios (Lote)
+              </h2>
+              <p className="text-muted-foreground mb-6 text-sm">
+                Agrega tantos episodios como necesites. El número y título se autocompletan para que sea súper simple, y opcionalmente puedes agregar más opciones de servidores.
+              </p>
+
+              {animes.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground mb-4">
+                    Primero debes agregar al menos un anime
+                  </p>
+                  <Button onClick={() => setActiveTab("add-anime")} className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    Agregar Anime
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  {bulkSuccess && (
+                    <div className="flex items-center gap-2 p-4 mb-6 bg-green-500/10 border border-green-500/30 rounded-lg text-green-500">
+                      <Check className="w-5 h-5" />
+                      Todos los episodios fueron agregados exitosamente
+                    </div>
+                  )}
+
+                  {bulkError && (
+                    <div className="flex items-center gap-2 p-4 mb-6 bg-destructive/10 border border-destructive/30 rounded-lg text-destructive">
+                      <AlertCircle className="w-5 h-5" />
+                      {bulkError}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleAddBulkEpisodes} className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Seleccionar Anime *
+                      </label>
+                      <Select
+                        value={bulkAnimeId}
+                        onValueChange={setBulkAnimeId}
+                      >
+                        <SelectTrigger className="w-full max-w-sm">
+                          <SelectValue placeholder="Selecciona un anime" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {animes.filter(a => a.status !== "Finalizado").map((anime) => (
+                            <SelectItem key={anime.id} value={anime.id}>
+                              {anime.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-foreground mb-2">
+                          Número Inicial
+                        </label>
+                        <Input
+                          value={bulkStartNumber}
+                          onChange={(e) => setBulkStartNumber(e.target.value)}
+                          placeholder="Ej: 1"
+                          type="number"
+                          min="1"
+                          required
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Desde este número, los siguientes títulos serán "Episodio X+1"...
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-primary flex items-center gap-2">
+                          Servidor 1 (Principal) *
+                        </label>
+                        <textarea
+                          value={bulkServer1}
+                          onChange={(e) => setBulkServer1(e.target.value)}
+                          placeholder="https://ejemplo.com/ep1&#10;https://ejemplo.com/ep2"
+                          required
+                          rows={10}
+                          className="w-full px-3 py-2 bg-input border border-primary/50 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary font-mono text-xs whitespace-pre"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-muted-foreground flex items-center gap-2">
+                          <ServerIcon className="w-4 h-4" />
+                          Servidor 2 (Opcional)
+                        </label>
+                        <textarea
+                          value={bulkServer2}
+                          onChange={(e) => setBulkServer2(e.target.value)}
+                          placeholder="https://drive.com/ep1&#10;https://drive.com/ep2"
+                          rows={10}
+                          className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring font-mono text-xs whitespace-pre"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-muted-foreground flex items-center gap-2">
+                          <ServerIcon className="w-4 h-4" />
+                          Servidor 3 (Opcional)
+                        </label>
+                        <textarea
+                          value={bulkServer3}
+                          onChange={(e) => setBulkServer3(e.target.value)}
+                          placeholder="Otras URLs..."
+                          rows={10}
+                          className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring font-mono text-xs whitespace-pre"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-muted-foreground flex items-center gap-2">
+                          <ServerIcon className="w-4 h-4" />
+                          Servidor 4 (Opcional)
+                        </label>
+                        <textarea
+                          value={bulkServer4}
+                          onChange={(e) => setBulkServer4(e.target.value)}
+                          placeholder="Otras URLs..."
+                          rows={10}
+                          className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring font-mono text-xs whitespace-pre"
+                        />
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={isBulkSubmitting || !bulkAnimeId || !bulkServer1.trim()}
+                      className="w-full"
+                    >
+                      {isBulkSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Procesando...
+                        </>
+                      ) : (
+                        "Añadir Todos los Episodios"
                       )}
                     </Button>
                   </form>

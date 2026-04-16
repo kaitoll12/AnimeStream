@@ -84,7 +84,7 @@ export default function WatchPage({ params }: WatchPageProps) {
           <div className="max-w-7xl mx-auto">
             <VideoPlayer
               src={videoSrc}
-              title={`${anime.title} - Episode ${currentEpisode.number}: ${currentEpisode.title}`}
+              title={`${anime.title} - Episode ${currentEpisode.number}${currentEpisode.title ? `: ${currentEpisode.title}` : ""}`}
               onEnded={handleEpisodeEnd}
             />
           </div>
@@ -169,7 +169,7 @@ export default function WatchPage({ params }: WatchPageProps) {
           {/* Episode Info */}
           <div className="bg-card border border-border rounded-xl p-6 mb-8">
             <h1 className="text-2xl font-bold text-foreground mb-2">
-              Episode {currentEpisode.number}: {currentEpisode.title}
+              Episode {currentEpisode.number}{currentEpisode.title ? `: ${currentEpisode.title}` : ""}
             </h1>
             <p className="text-muted-foreground">{anime.title}</p>
           </div>

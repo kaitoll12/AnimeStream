@@ -42,12 +42,20 @@ export function EpisodeCard({ episode, animeId, animeTitle, isActive }: EpisodeC
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-muted-foreground">
-          Episode {episode.number}
-        </p>
-        <h4 className="font-medium text-foreground truncate">
-          {episode.title || `${animeTitle} - Episode ${episode.number}`}
-        </h4>
+        {episode.title ? (
+          <>
+            <p className="text-sm text-muted-foreground">
+              Episode {episode.number}
+            </p>
+            <h4 className="font-medium text-foreground truncate">
+              {episode.title}
+            </h4>
+          </>
+        ) : (
+          <h4 className="font-medium text-foreground truncate">
+            Episode {episode.number}
+          </h4>
+        )}
       </div>
 
       {/* Duration placeholder */}

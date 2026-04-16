@@ -37,6 +37,7 @@ interface AnimeContextType {
   updateAnime: (id: string, anime: Partial<Omit<Anime, "id" | "episodes">>) => void
   deleteAnime: (id: string) => void
   addEpisode: (animeId: string, episode: Omit<Episode, "id">) => void
+  addBulkEpisodes: (animeId: string, episodes: Omit<Episode, "id">[]) => void
   updateEpisode: (animeId: string, episodeId: string, episode: Partial<Omit<Episode, "id">>) => void
   deleteEpisode: (animeId: string, episodeId: string) => void
   toggleFavorite: (animeId: string) => void
@@ -146,6 +147,25 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
     await saveToDB(newState)
   }
 
+  const addBulkEpisodes = async (animeId: string, newEpisodes: Omit<Episode, "id">[]) => {
+    const newState = animes.map((anime) => {
+      if (anime.id === animeId) {
+        // Gen unique IDs by offsetting Date.now for each to ensure uniqueness
+        const episodesToAdd = newEpisodes.map((ep, index) => ({
+          ...ep,
+          id: `${animeId}-${Date.now()}-${index}`,
+        }));
+        return {
+          ...anime,
+          episodes: [...anime.episodes, ...episodesToAdd],
+        };
+      }
+      return anime;
+    });
+    setAnimes(newState);
+    await saveToDB(newState);
+  }
+
   const updateEpisode = async (animeId: string, episodeId: string, episode: Partial<Omit<Episode, "id">>) => {
     const newState = animes.map((anime) =>
       anime.id === animeId
@@ -216,6 +236,7 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
         updateAnime,
         deleteAnime,
         addEpisode,
+        addBulkEpisodes,
         updateEpisode,
         deleteEpisode,
         toggleFavorite,
