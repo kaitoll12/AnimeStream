@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { AnimeProvider } from '@/context/anime-context'
 import { AdminAuthProvider } from '@/context/admin-auth-context'
+import { AuthProvider } from '@/context/auth-provider'
 import { MikuChat } from '@/components/miku-chat'
 import './globals.css'
 
@@ -46,12 +47,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="font-sans antialiased">
-        <AdminAuthProvider>
-          <AnimeProvider>
-            {children}
-            <MikuChat />
-          </AnimeProvider>
-        </AdminAuthProvider>
+        <AuthProvider>
+          <AdminAuthProvider>
+            <AnimeProvider>
+              {children}
+              <MikuChat />
+            </AnimeProvider>
+          </AdminAuthProvider>
+        </AuthProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

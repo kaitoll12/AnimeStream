@@ -4,9 +4,17 @@ import Image from "next/image"
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Search, Menu, X, Play, Settings } from "lucide-react"
+import { useSession, signOut } from "next-auth/react"
+import { Search, Menu, X, Play, Settings, User, LogOut } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { AuthModal } from "@/components/auth-modal"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 
 interface NavbarProps {
@@ -15,8 +23,10 @@ interface NavbarProps {
 
 export function Navbar({ onSearch }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const pathname = usePathname()
+  const { data: session } = useSession()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -78,8 +88,35 @@ export function Navbar({ onSearch }: NavbarProps) {
             </div>
           </form>
 
-          {/* Admin Button */}
+          {/* Actions */}
           <div className="flex items-center gap-2">
+            {session?.user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="hidden sm:flex items-center gap-2 text-foreground">
+                    <User className="w-4 h-4" />
+                    <span className="max-w-[100px] truncate">{session.user.name}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-card border-border">
+                  <DropdownMenuItem className="text-muted-foreground hover:text-foreground cursor-pointer" onClick={() => signOut()}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Cerrar sesión
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hidden sm:flex items-center gap-2 text-foreground"
+                onClick={() => setIsAuthModalOpen(true)}
+              >
+                <User className="w-4 h-4" />
+                Iniciar sesión
+              </Button>
+            )}
+
             <Link href="/admin">
               <Button
                 variant="outline"
@@ -150,6 +187,8 @@ export function Navbar({ onSearch }: NavbarProps) {
           </div>
         )}
       </div>
+      
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </nav>
   )
 }
