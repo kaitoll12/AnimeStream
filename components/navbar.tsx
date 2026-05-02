@@ -8,7 +8,7 @@ import { useSession, signOut } from "next-auth/react"
 import { Search, Menu, X, Play, Settings, User, LogOut } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { AuthModal } from "@/components/auth-modal"
+import { useUI } from "@/context/ui-context"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,10 +23,10 @@ interface NavbarProps {
 
 export function Navbar({ onSearch }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const pathname = usePathname()
   const { data: session } = useSession()
+  const { openAuthModal } = useUI()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -110,7 +110,7 @@ export function Navbar({ onSearch }: NavbarProps) {
                 variant="ghost"
                 size="sm"
                 className="hidden sm:flex items-center gap-2 text-foreground"
-                onClick={() => setIsAuthModalOpen(true)}
+                onClick={openAuthModal}
               >
                 <User className="w-4 h-4" />
                 Iniciar sesión
@@ -187,8 +187,6 @@ export function Navbar({ onSearch }: NavbarProps) {
           </div>
         )}
       </div>
-      
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </nav>
   )
 }

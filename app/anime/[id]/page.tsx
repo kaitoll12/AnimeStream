@@ -7,7 +7,7 @@ import { useAnime } from "@/context/anime-context"
 import { Navbar } from "@/components/navbar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Star, Heart, Play, ArrowLeft, Search, ArrowUpDown } from "lucide-react"
+import { Star, Heart, Play, ArrowLeft, Search, ArrowUpDown, CheckCircle } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 
@@ -17,7 +17,7 @@ interface AnimeDetailPageProps {
 
 export default function AnimeDetailPage({ params }: AnimeDetailPageProps) {
   const { id } = use(params)
-  const { getAnimeById, toggleFavorite } = useAnime()
+  const { getAnimeById, toggleFavorite, watchedEpisodes, toggleWatched } = useAnime()
   const anime = getAnimeById(id)
 
   const [isDescending, setIsDescending] = useState(false);
@@ -276,7 +276,10 @@ export default function AnimeDetailPage({ params }: AnimeDetailPageProps) {
                     src={episode.thumbnail || anime.bannerUrl || anime.imageUrl}
                     alt={episode.title || `Episode ${episode.number}`}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className={cn(
+                      "object-cover transition-transform duration-300",
+                      watchedEpisodes.includes(episode.id) ? "opacity-50 grayscale-[50%]" : "group-hover:scale-105"
+                    )}
                     sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                   />
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
@@ -287,6 +290,18 @@ export default function AnimeDetailPage({ params }: AnimeDetailPageProps) {
                       <Play className="w-5 h-5 text-primary-foreground fill-current ml-1" />
                     </div>
                   </div>
+
+                  {/* Watched Button */}
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault()
+                      toggleWatched(episode.id)
+                    }}
+                    className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 hover:bg-black/80 text-white/70 hover:text-white backdrop-blur-md transition-all z-10"
+                    title={watchedEpisodes.includes(episode.id) ? "Desmarcar" : "Marcar como visto"}
+                  >
+                    <CheckCircle className={cn("w-5 h-5", watchedEpisodes.includes(episode.id) && "text-green-500 fill-green-500/20")} />
+                  </button>
 
                   {/* Episode Badge */}
                   <div className="absolute bottom-0 left-0 bg-[#1e2029]/95 backdrop-blur-md px-3 py-1.5 rounded-tr-xl border-t border-r border-white/5">

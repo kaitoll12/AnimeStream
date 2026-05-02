@@ -8,8 +8,9 @@ import { Navbar } from "@/components/navbar"
 import { VideoPlayer } from "@/components/video-player"
 
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, ChevronLeft, ChevronRight, Server as ServerIcon } from "lucide-react"
+import { ArrowLeft, ChevronLeft, ChevronRight, Server as ServerIcon, CheckCircle } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { cn } from "@/lib/utils"
 
 interface WatchPageProps {
   params: Promise<{ animeId: string; episodeId: string }>
@@ -18,7 +19,7 @@ interface WatchPageProps {
 export default function WatchPage({ params }: WatchPageProps) {
   const { animeId, episodeId } = use(params)
   const router = useRouter()
-  const { getAnimeById } = useAnime()
+  const { getAnimeById, watchedEpisodes, toggleWatched } = useAnime()
   const anime = getAnimeById(animeId)
 
   const currentEpisode = useMemo(() => {
@@ -196,12 +197,27 @@ export default function WatchPage({ params }: WatchPageProps) {
               )}
             </div>
 
-            {/* Anime Title Link */}
-            <div className="mt-2 px-2">
+            {/* Episode Controls */}
+            <div className="mt-4 px-2 flex items-center justify-between">
               <Link href={`/anime/${animeId}`} className="text-primary hover:text-primary/80 transition-colors font-medium text-sm md:text-base flex items-center gap-2 w-fit">
                 <ArrowLeft className="w-4 h-4" />
                 Volver a {anime.title}
               </Link>
+              
+              <Button
+                variant={watchedEpisodes.includes(episodeId) ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => toggleWatched(episodeId)}
+                className={cn(
+                  "gap-2 transition-colors",
+                  watchedEpisodes.includes(episodeId) 
+                    ? "bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500/20" 
+                    : "border-border text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <CheckCircle className="w-4 h-4" />
+                {watchedEpisodes.includes(episodeId) ? "Visto" : "Marcar como visto"}
+              </Button>
             </div>
           </div>
 
@@ -238,16 +254,23 @@ export default function WatchPage({ params }: WatchPageProps) {
                   {visibleEpisodes.map((episode) => {
                     const isActive = episode.id === episodeId;
                     return (
-                      <Link key={episode.id} href={`/watch/${animeId}/${episode.id}`}>
+                      <Link key={episode.id} href={`/watch/${animeId}/${episode.id}`} className="relative group">
                         <Button
                           variant={isActive ? "outline" : "secondary"}
-                          className={`w-full p-0 h-10 transition-all font-medium ${
+                          className={`w-full p-0 h-10 transition-all font-medium relative overflow-hidden ${
                             isActive 
                               ? "border-primary text-primary bg-primary/10 hover:bg-primary/20 hover:text-primary ring-1 ring-primary/50" 
-                              : "bg-secondary/30 hover:bg-secondary text-muted-foreground hover:text-foreground"
+                              : watchedEpisodes.includes(episode.id)
+                                ? "bg-secondary/20 hover:bg-secondary/40 text-muted-foreground/60 border border-transparent"
+                                : "bg-secondary/30 hover:bg-secondary text-muted-foreground hover:text-foreground"
                           }`}
                         >
-                          {episode.number}
+                          <span className={watchedEpisodes.includes(episode.id) && !isActive ? "opacity-50" : ""}>
+                            {episode.number}
+                          </span>
+                          {watchedEpisodes.includes(episode.id) && (
+                            <CheckCircle className={cn("absolute bottom-0.5 right-0.5 w-2.5 h-2.5 opacity-60 text-green-500", isActive && "opacity-100")} />
+                          )}
                         </Button>
                       </Link>
                     )

@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { toast } from "sonner"
+import { useSession } from "next-auth/react"
+import { useUI } from "./ui-context"
 
 export interface Server {
   id: string
@@ -44,6 +46,8 @@ interface AnimeContextType {
   getAnimeById: (id: string) => Anime | undefined
   searchAnimes: (query: string) => Anime[]
   filterByCategory: (category: string) => Anime[]
+  watchedEpisodes: string[]
+  toggleWatched: (episodeId: string) => void
 }
 
 const AnimeContext = createContext<AnimeContextType | undefined>(undefined)
@@ -56,6 +60,10 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
   const [animes, setAnimes] = useState<Anime[]>([])
   const [isLoaded, setIsLoaded] = useState(false)
   const [favorites, setFavorites] = useState<string[]>([])
+  const [watchedEpisodes, setWatchedEpisodes] = useState<string[]>([])
+
+  const { data: session, status } = useSession()
+  const { openAuthModal } = useUI()
 
   // Fetch from Global DB
   useEffect(() => {
@@ -73,22 +81,25 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
       }
     }
     fetchAnimes()
-
-    // Load favorites from localStorage
-    const storedFavs = localStorage.getItem('animestream_favorites')
-    if (storedFavs) {
-      try {
-        setFavorites(JSON.parse(storedFavs))
-      } catch {
-        setFavorites([])
-      }
-    }
   }, [])
 
-  // Save favorites to localStorage
+  // Fetch user data when session changes
   useEffect(() => {
-    localStorage.setItem('animestream_favorites', JSON.stringify(favorites))
-  }, [favorites])
+    if (status === "authenticated") {
+      fetch('/api/user/favorites')
+        .then(res => res.json())
+        .then(data => { if (Array.isArray(data)) setFavorites(data) })
+        .catch(err => console.error(err))
+
+      fetch('/api/user/watched')
+        .then(res => res.json())
+        .then(data => { if (Array.isArray(data)) setWatchedEpisodes(data) })
+        .catch(err => console.error(err))
+    } else if (status === "unauthenticated") {
+      setFavorites([])
+      setWatchedEpisodes([])
+    }
+  }, [status])
 
   const saveToDB = async (newAnimes: Anime[]) => {
     try {
@@ -194,12 +205,50 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
     await saveToDB(newState)
   }
 
-  const toggleFavorite = (animeId: string) => {
+  const toggleFavorite = async (animeId: string) => {
+    if (!session) {
+      openAuthModal()
+      return
+    }
+
     setFavorites((prev) =>
       prev.includes(animeId)
         ? prev.filter((id) => id !== animeId)
         : [...prev, animeId]
     )
+
+    try {
+      await fetch('/api/user/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ animeId })
+      })
+    } catch(e) {
+      console.error(e)
+    }
+  }
+
+  const toggleWatched = async (episodeId: string) => {
+    if (!session) {
+      openAuthModal()
+      return
+    }
+
+    setWatchedEpisodes((prev) =>
+      prev.includes(episodeId)
+        ? prev.filter((id) => id !== episodeId)
+        : [...prev, episodeId]
+    )
+
+    try {
+      await fetch('/api/user/watched', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ episodeId })
+      })
+    } catch(e) {
+      console.error(e)
+    }
   }
 
   const getAnimeById = (id: string) => animes.find((anime) => anime.id === id)
@@ -243,6 +292,8 @@ export function AnimeProvider({ children }: { children: ReactNode }) {
         getAnimeById,
         searchAnimes,
         filterByCategory,
+        watchedEpisodes,
+        toggleWatched,
       }}
     >
       {children}

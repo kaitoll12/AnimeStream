@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { AnimeProvider } from '@/context/anime-context'
+import { UIProvider } from '@/context/ui-context'
 import { AdminAuthProvider } from '@/context/admin-auth-context'
 import { AuthProvider } from '@/context/auth-provider'
 import { MikuChat } from '@/components/miku-chat'
@@ -48,12 +49,14 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="font-sans antialiased">
         <AuthProvider>
-          <AdminAuthProvider>
-            <AnimeProvider>
-              {children}
-              <MikuChat />
-            </AnimeProvider>
-          </AdminAuthProvider>
+          <UIProvider>
+            <AdminAuthProvider>
+              <AnimeProvider>
+                {children}
+                <MikuChat />
+              </AnimeProvider>
+            </AdminAuthProvider>
+          </UIProvider>
         </AuthProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
