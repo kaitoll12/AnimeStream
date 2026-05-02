@@ -1,14 +1,14 @@
 "use client"
 
-import { use } from "react"
+import { use, useState, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useAnime } from "@/context/anime-context"
 import { Navbar } from "@/components/navbar"
-import { EpisodeCard } from "@/components/episode-card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Star, Heart, Play, ArrowLeft } from "lucide-react"
+import { Star, Heart, Play, ArrowLeft, Search, ArrowUpDown } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 
 interface AnimeDetailPageProps {
@@ -19,6 +19,39 @@ export default function AnimeDetailPage({ params }: AnimeDetailPageProps) {
   const { id } = use(params)
   const { getAnimeById, toggleFavorite } = useAnime()
   const anime = getAnimeById(id)
+
+  const [isDescending, setIsDescending] = useState(false);
+  const [selectedRangeIndex, setSelectedRangeIndex] = useState(0);
+
+  const episodesPerPage = 50;
+  const totalEpisodes = anime?.episodes.length || 0;
+  
+  const episodeRanges = useMemo(() => {
+    if (!anime) return [];
+    const ranges = [];
+    for (let i = 0; i < totalEpisodes; i += episodesPerPage) {
+      const start = i + 1;
+      const end = Math.min(i + episodesPerPage, totalEpisodes);
+      ranges.push({ start, end, index: ranges.length });
+    }
+    return ranges;
+  }, [anime, totalEpisodes]);
+
+  const visibleEpisodes = useMemo(() => {
+    if (!anime) return [];
+    
+    let sorted = [...anime.episodes];
+    if (isDescending) {
+      sorted.reverse();
+    }
+
+    if (episodeRanges.length <= 1) return sorted;
+    
+    const range = episodeRanges[selectedRangeIndex];
+    if (!range) return sorted;
+    
+    return sorted.filter(ep => ep.number >= range.start && ep.number <= range.end);
+  }, [anime, episodeRanges, selectedRangeIndex, isDescending]);
 
   if (!anime) {
     return (
@@ -193,18 +226,75 @@ export default function AnimeDetailPage({ params }: AnimeDetailPageProps) {
 
         {/* Episodes Section */}
         <section className="mt-12">
-          <h2 className="text-2xl font-bold text-foreground mb-6">
-            Episodes ({anime.episodes.length})
-          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <h2 className="text-2xl font-bold text-foreground">
+              Episodios
+            </h2>
+            
+            <div className="flex items-center gap-2">
+              {episodeRanges.length > 1 && (
+                <Select 
+                  value={selectedRangeIndex.toString()} 
+                  onValueChange={(val) => setSelectedRangeIndex(parseInt(val))}
+                >
+                  <SelectTrigger className="w-fit min-w-[100px] bg-secondary/50 border-none hover:bg-secondary transition-colors">
+                    <SelectValue placeholder="Rango" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {episodeRanges.map((range) => (
+                      <SelectItem key={range.index} value={range.index.toString()}>
+                        {range.start} - {range.end}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              
+              <Button variant="secondary" size="icon" className="bg-secondary/50 border-none shrink-0 hover:bg-secondary transition-colors">
+                <Search className="w-4 h-4" />
+              </Button>
+              <Button 
+                variant="secondary" 
+                size="icon" 
+                className={cn("bg-secondary/50 border-none shrink-0 hover:bg-secondary transition-colors", isDescending && "rotate-180")}
+                onClick={() => setIsDescending(!isDescending)}
+              >
+                <ArrowUpDown className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
           {anime.episodes.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {anime.episodes.map((episode) => (
-                <EpisodeCard
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {visibleEpisodes.map((episode) => (
+                <Link
                   key={episode.id}
-                  episode={episode}
-                  animeId={anime.id}
-                  animeTitle={anime.title}
-                />
+                  href={`/watch/${anime.id}/${episode.id}`}
+                  className="group relative aspect-video rounded-xl overflow-hidden bg-secondary border border-border/50 hover:border-primary/50 transition-colors"
+                >
+                  <Image
+                    src={episode.thumbnail || anime.bannerUrl || anime.imageUrl}
+                    alt={episode.title || `Episode ${episode.number}`}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                  />
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
+                  
+                  {/* Play Icon Overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-12 h-12 rounded-full bg-primary/90 flex items-center justify-center backdrop-blur-sm shadow-lg scale-90 group-hover:scale-100 transition-transform">
+                      <Play className="w-5 h-5 text-primary-foreground fill-current ml-1" />
+                    </div>
+                  </div>
+
+                  {/* Episode Badge */}
+                  <div className="absolute bottom-0 left-0 bg-[#1e2029]/95 backdrop-blur-md px-3 py-1.5 rounded-tr-xl border-t border-r border-white/5">
+                    <span className="text-xs font-semibold text-gray-300">
+                      Episodio <span className="font-bold text-white">{episode.number}</span>
+                    </span>
+                  </div>
+                </Link>
               ))}
             </div>
           ) : (
