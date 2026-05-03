@@ -82,11 +82,33 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, trigger, session }) {
+      if (trigger === "update" && session) {
+        if (session.name) token.name = session.name;
+        if (session.image !== undefined) token.picture = session.image;
+      }
+      if (account) {
+        token.provider = account.provider;
+      }
       if (user) {
         token.id = user.id;
         token.name = user.name;
-        // Since Google provider sets 'name', we can just use it as 'username'
+        if (user.image) token.picture = user.image;
+
+        // Sobreescribir con los valores de la base de datos para no perder los cambios tras reloguear
+        if (redis && user.email) {
+          try {
+            const userKey = `user:${user.email.toLowerCase()}`;
+            const userDataStr = await redis.get(userKey);
+            if (userDataStr) {
+              const dbUser = JSON.parse(userDataStr);
+              if (dbUser.username) token.name = dbUser.username;
+              if (dbUser.image) token.picture = dbUser.image;
+            }
+          } catch (e) {
+            console.error("Error fetching user data in jwt callback", e);
+          }
+        }
       }
       return token;
     },
@@ -94,6 +116,8 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as any).id = token.id;
         (session.user as any).name = token.name;
+        if (token.picture) session.user.image = token.picture as string;
+        if (token.provider) (session.user as any).provider = token.provider;
       }
       return session;
     }

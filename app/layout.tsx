@@ -49,14 +49,14 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="font-sans antialiased">
         <AuthProvider>
-          <UIProvider>
-            <AdminAuthProvider>
+          <AdminAuthProvider>
+            <UIProvider>
               <AnimeProvider>
                 {children}
                 <MikuChat />
               </AnimeProvider>
-            </AdminAuthProvider>
-          </UIProvider>
+            </UIProvider>
+          </AdminAuthProvider>
         </AuthProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

@@ -9,6 +9,7 @@ import { Search, Menu, X, Play, Settings, User, LogOut } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useUI } from "@/context/ui-context"
+import { useAdminAuth } from "@/context/admin-auth-context"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +28,7 @@ export function Navbar({ onSearch }: NavbarProps) {
   const pathname = usePathname()
   const { data: session } = useSession()
   const { openAuthModal } = useUI()
+  const { isLoggedIn: isAdmin } = useAdminAuth()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -93,12 +95,21 @@ export function Navbar({ onSearch }: NavbarProps) {
             {session?.user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="hidden sm:flex items-center gap-2 text-foreground">
-                    <User className="w-4 h-4" />
-                    <span className="max-w-[100px] truncate">{session.user.name}</span>
+                  <Button variant="ghost" size="icon" className="hidden sm:flex rounded-full overflow-hidden border border-border bg-secondary/50 hover:bg-secondary">
+                    {session.user.image ? (
+                      <img src={session.user.image} alt={session.user.name || "User"} className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-4 h-4 text-muted-foreground" />
+                    )}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 bg-card border-border">
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings" className="text-muted-foreground hover:text-foreground cursor-pointer flex items-center w-full">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Opciones
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem className="text-muted-foreground hover:text-foreground cursor-pointer" onClick={() => signOut()}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Cerrar sesión
@@ -117,16 +128,18 @@ export function Navbar({ onSearch }: NavbarProps) {
               </Button>
             )}
 
-            <Link href="/admin">
-              <Button
-                variant="outline"
-                size="sm"
-                className="hidden sm:flex items-center gap-2 border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
-              >
-                <Settings className="w-4 h-4" />
-                Admin
-              </Button>
-            </Link>
+            {isAdmin && (
+              <Link href="/admin">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="hidden sm:flex items-center gap-2 border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
+                >
+                  <Settings className="w-4 h-4" />
+                  Admin
+                </Button>
+              </Link>
+            )}
 
             {/* Mobile Menu Button */}
             <Button
@@ -175,14 +188,16 @@ export function Navbar({ onSearch }: NavbarProps) {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                href="/admin"
-                onClick={() => setIsMenuOpen(false)}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-primary hover:bg-secondary flex items-center gap-2"
-              >
-                <Settings className="w-4 h-4" />
-                Admin Panel
-              </Link>
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-primary hover:bg-secondary flex items-center gap-2"
+                >
+                  <Settings className="w-4 h-4" />
+                  Admin Panel
+                </Link>
+              )}
             </div>
           </div>
         )}

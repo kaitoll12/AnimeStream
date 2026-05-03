@@ -15,7 +15,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         // Generate a client token for the browser to upload the file
         // No authentication check for now as it's a simple local admin
         return {
-          allowedContentTypes: ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'],
+          allowedContentTypes: ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'image/jpeg', 'image/png', 'image/webp', 'image/gif'],
           tokenPayload: JSON.stringify({
             // optional, sent to your server on upload completion
           }),

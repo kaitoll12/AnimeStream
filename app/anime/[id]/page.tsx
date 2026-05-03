@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Star, Heart, Play, ArrowLeft, Search, ArrowUpDown, CheckCircle } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+import CommentsSection from "@/components/CommentsSection"
 
 interface AnimeDetailPageProps {
   params: Promise<{ id: string }>
@@ -317,6 +318,11 @@ export default function AnimeDetailPage({ params }: AnimeDetailPageProps) {
               <p className="text-muted-foreground">No episodes available yet.</p>
             </div>
           )}
+        </section>
+
+        {/* Comments Section */}
+        <section className="mt-12">
+          <CommentsSection entityId={anime.id} />
         </section>
       </div>
 

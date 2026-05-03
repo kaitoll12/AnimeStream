@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, ChevronLeft, ChevronRight, Server as ServerIcon, CheckCircle } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+import CommentsSection from "@/components/CommentsSection"
 
 interface WatchPageProps {
   params: Promise<{ animeId: string; episodeId: string }>
@@ -281,6 +282,10 @@ export default function WatchPage({ params }: WatchPageProps) {
           </div>
 
         </div>
+      </div>
+
+      <div className="max-w-[1400px] mx-auto px-4 mt-8">
+        <CommentsSection entityId={`${animeId}-${episodeId}`} />
       </div>
 
       {/* Footer */}

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
+import { useAdminAuth } from "@/context/admin-auth-context"
 
 interface AuthModalProps {
   isOpen: boolean
@@ -22,6 +23,8 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
+  const { login: adminLogin } = useAdminAuth()
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
@@ -29,7 +32,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
     try {
       if (isLogin) {
-        // Login flow
+        // Intentar login de admin primero
+        if (adminLogin(email, password)) {
+          onClose()
+          setIsLoading(false)
+          return
+        }
+
+        // Login normal
         const result = await signIn("credentials", {
           redirect: false,
           email,
@@ -102,11 +112,11 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm text-gray-300">Correo electrónico</Label>
+              <Label htmlFor="email" className="text-sm text-gray-300">Correo electrónico o Usuario Admin</Label>
               <Input
                 id="email"
-                type="email"
-                placeholder="correo@gmail.com"
+                type="text"
+                placeholder="correo@gmail.com o usuario admin"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-[#1C1F26] border-none text-white focus-visible:ring-1 focus-visible:ring-primary"
