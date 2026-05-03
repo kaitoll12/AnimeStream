@@ -14,6 +14,8 @@ export interface Comment {
   content: string
   createdAt: string
   likes: number
+  likedBy?: string[]
+  parentId?: string
 }
 
 export async function GET(request: Request) {
@@ -47,7 +49,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { entityId, content } = await request.json()
+    const { entityId, content, parentId } = await request.json()
 
     if (!entityId || !content) {
       return NextResponse.json({ error: 'entityId and content are required' }, { status: 400 })
@@ -68,7 +70,9 @@ export async function POST(request: Request) {
       avatar: session.user.image || null,
       content,
       createdAt: new Date().toISOString(),
-      likes: 0
+      likes: 0,
+      likedBy: [],
+      parentId: parentId || undefined
     }
 
     comments.push(newComment)
