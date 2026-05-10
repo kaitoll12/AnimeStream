@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       let currentToken = token;
-      
+
       if (!currentToken) {
         currentToken = await SecureStore.getItemAsync('session_token');
       }
@@ -46,9 +46,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (currentToken) {
         setSessionToken(currentToken);
         await SecureStore.setItemAsync('session_token', currentToken);
-        
+
         // Verificar validez usando nuestro propio endpoint móvil para evitar problemas de cookies de NextAuth
-        const res = await fetch(`${API_URL}/api/mobile/session`, { 
+        const res = await fetch(`${API_URL}/api/mobile/session`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           cache: 'no-store'
         });
         const data = await res.json();
-        
+
         if (data && data.user) {
           setUser(data.user);
         } else {

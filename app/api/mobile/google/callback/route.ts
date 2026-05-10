@@ -4,10 +4,12 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const cookieStore = await cookies()
   
-  const returnUrl = cookieStore.get('mobile_return_url')?.value
-  if (!returnUrl) {
+  const returnUrlRaw = cookieStore.get('mobile_return_url')?.value
+  if (!returnUrlRaw) {
     return NextResponse.json({ error: 'Missing return URL from cookie' }, { status: 400 })
   }
+
+  const returnUrl = decodeURIComponent(returnUrlRaw)
 
   // Get the session token set by NextAuth
   const sessionToken = cookieStore.get('next-auth.session-token')?.value || cookieStore.get('__Secure-next-auth.session-token')?.value
