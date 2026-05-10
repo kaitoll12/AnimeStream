@@ -63,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (data && data.user) {
           setUser(data.user);
         } else {
+          alert('Error de sesión: ' + JSON.stringify(data));
           setUser(null);
           setSessionToken(null);
           await SecureStore.deleteItemAsync('session_token');

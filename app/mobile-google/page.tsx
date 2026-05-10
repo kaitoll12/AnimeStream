@@ -14,11 +14,8 @@ export default function MobileGoogleLogin() {
     if (returnUrl && !hasTriggered.current) {
       hasTriggered.current = true
       
-      // Save the returnUrl in cookie so the backend callback can read it and redirect back to the app
-      document.cookie = `mobile_return_url=${encodeURIComponent(returnUrl)}; path=/; max-age=600; samesite=lax`
-      
-      // Auto-trigger NextAuth Google Sign In via POST
-      const callback = `${window.location.origin}/api/mobile/google/callback`
+      // Auto-trigger NextAuth Google Sign In via POST, passing returnUrl in the query string
+      const callback = `${window.location.origin}/api/mobile/google/callback?returnUrl=${encodeURIComponent(returnUrl)}`
       signIn('google', { callbackUrl: callback })
     }
   }, [returnUrl])

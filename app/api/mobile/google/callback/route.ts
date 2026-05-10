@@ -2,14 +2,16 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
-  const cookieStore = await cookies()
-  
-  const returnUrlRaw = cookieStore.get('mobile_return_url')?.value
+  const url = new URL(request.url)
+  const returnUrlRaw = url.searchParams.get('returnUrl')
+
   if (!returnUrlRaw) {
-    return NextResponse.json({ error: 'Missing return URL from cookie' }, { status: 400 })
+    return NextResponse.json({ error: 'Missing return URL from query params' }, { status: 400 })
   }
 
   const returnUrl = decodeURIComponent(returnUrlRaw)
+
+  const cookieStore = await cookies()
 
   // Get the session token set by NextAuth
   const sessionToken = cookieStore.get('next-auth.session-token')?.value || cookieStore.get('__Secure-next-auth.session-token')?.value
