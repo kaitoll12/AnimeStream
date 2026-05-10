@@ -65,7 +65,7 @@ export default function ProfileScreen() {
         setError(logData.error || "Error al iniciar sesión");
       } else if (logData.session_token) {
         await checkSession(logData.session_token);
-        setShowLoginModal(false);
+        setShowLoginForm(false);
         // Reset form
         setEmail("");
         setPassword("");

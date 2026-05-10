@@ -41,6 +41,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, message: 'Usuario registrado exitosamente' }, { status: 201 })
   } catch (error: any) {
     console.error('Error in /api/auth/register:', error)
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
+    return NextResponse.json({ error: error.message || 'Error interno del servidor', stack: error.stack }, { status: 500 })
   }
 }

@@ -32,6 +32,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Contraseña incorrecta' }, { status: 401 })
     }
 
+    const isSecure = request.url.startsWith('https://') || request.headers.get('x-forwarded-proto') === 'https'
+    const cookieName = isSecure ? '__Secure-next-auth.session-token' : 'next-auth.session-token'
+
     // Generate a NextAuth JWT manually so mobile app can use it
     const token = await encode({
       token: {
@@ -41,6 +44,7 @@ export async function POST(request: Request) {
         picture: user.image || null,
       },
       secret: process.env.NEXTAUTH_SECRET || "default_secret_for_development_only_123",
+      salt: cookieName,
     })
 
     return NextResponse.json({ session_token: token, user })

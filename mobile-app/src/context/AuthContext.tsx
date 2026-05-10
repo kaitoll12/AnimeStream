@@ -28,8 +28,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
     const headers = new Headers(options.headers || {});
     if (sessionToken) {
-      // Inyectamos la cookie mágicamente
-      headers.set('Cookie', `next-auth.session-token=${sessionToken}`);
+      // Inyectamos la cookie mágicamente (soporte para HTTP local y HTTPS producción)
+      headers.set('Cookie', `next-auth.session-token=${sessionToken}; __Secure-next-auth.session-token=${sessionToken}`);
     }
     return fetch(url, { ...options, headers });
   };
@@ -47,11 +47,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSessionToken(currentToken);
         await SecureStore.setItemAsync('session_token', currentToken);
         
-        // Verificar validez con el servidor usando la cookie
-        const headers = new Headers();
-        headers.set('Cookie', `next-auth.session-token=${currentToken}`);
-        
-        const res = await fetch(`${API_URL}/api/auth/session`, { headers });
+        // Verificar validez usando nuestro propio endpoint móvil para evitar problemas de cookies de NextAuth
+        const res = await fetch(`${API_URL}/api/mobile/session`, { 
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          },
+          body: JSON.stringify({ token: currentToken }),
+          cache: 'no-store'
+        });
         const data = await res.json();
         
         if (data && data.user) {
