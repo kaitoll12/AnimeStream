@@ -2,7 +2,7 @@
 
 // Durante el desarrollo, usa la IP local de tu computadora (Wi-Fi)
 // Si publicas la app web en Vercel, cambia esto por tu URL pública (ej. https://aniflex.vercel.app)
-export const API_URL = 'http://192.168.1.4:3000';
+export const API_URL = 'https://anime-steam-projects.vercel.app/';
 
 export const getImageUrl = (url: string | undefined | null) => {
   if (!url) return 'https://via.placeholder.com/400x600';

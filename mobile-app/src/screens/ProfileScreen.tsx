@@ -83,7 +83,7 @@ export default function ProfileScreen() {
     setError("");
     try {
       const returnUrl = Linking.createURL('login');
-      const authUrl = `${API_URL}/api/mobile/google?returnUrl=${encodeURIComponent(returnUrl)}`;
+      const authUrl = `${API_URL}/mobile-google?returnUrl=${encodeURIComponent(returnUrl)}`;
       
       const result = await WebBrowser.openAuthSessionAsync(authUrl, returnUrl);
 
